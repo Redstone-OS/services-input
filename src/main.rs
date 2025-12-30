@@ -10,6 +10,21 @@ use redpowder::prelude::*;
 pub extern "C" fn _start() -> ! {
     println!("(Service) Input Service Started");
 
+    // Tenta conectar ao Shell (retry loop)
+    let shell_port = loop {
+        match redpowder::ipc::Port::connect("shell_input") {
+            Ok(p) => {
+                println!("(Service) Connected to Shell!");
+                break p;
+            }
+            Err(_) => {
+                // Shell ainda não criou a porta, esperar e tentar de novo
+                println!("(Service) Waiting for Shell...");
+                sleep(100);
+            }
+        }
+    };
+
     let mut key_buffer = [KeyEvent::default(); 32];
 
     loop {
@@ -18,23 +33,27 @@ pub extern "C" fn _start() -> ! {
             Ok(count) => {
                 for i in 0..count {
                     let ev = key_buffer[i];
-                    println!(
-                        "(Input) Key: Scancode={:02X} Pressed={}",
-                        ev.scancode, ev.pressed
-                    );
+                    // Serializa e envia
+                    // Struct Layout: [scancode (1 byte), pressed (1 byte), padding (6 bytes)] -> 8 bytes?
+                    // KeyEvent é struct { scancode: u8, pressed: bool } -> alignment padding.
+                    // Vamos enviar manualmente como bytes
+                    let mut packet = [0u8; 2];
+                    packet[0] = ev.scancode;
+                    packet[1] = if ev.pressed { 1 } else { 0 };
+
+                    if let Err(_) = shell_port.send(&packet, 0) {
+                        println!("(Input) Failed to send to shell");
+                    }
                 }
             }
             Err(_) => {} // Ignore errors
         }
 
-        // Poll Mouse
+        // Poll Mouse (ainda loga no console por enquanto)
         match poll_mouse() {
             Ok(mouse) => {
                 if mouse.delta_x != 0 || mouse.delta_y != 0 || mouse.buttons != 0 {
-                    println!(
-                        "(Input) Mouse: X={} Y={} Buttons={:b} dX={} dY={}",
-                        mouse.x, mouse.y, mouse.buttons, mouse.delta_x, mouse.delta_y
-                    );
+                    // Futuro: enviar para Compositor
                 }
             }
             Err(_) => {}
