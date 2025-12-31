@@ -65,6 +65,7 @@ pub extern "C" fn _start() -> ! {
         }
 
         // Sleep to prevent 100% CPU usage
+        println!("(Input) Tick");
         sleep(10);
     }
 }
