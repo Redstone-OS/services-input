@@ -1,10 +1,15 @@
 #![no_std]
 #![no_main]
 
+extern crate alloc;
 extern crate redpowder;
 
 use redpowder::input::{poll_keyboard, poll_mouse, KeyEvent};
 use redpowder::prelude::*;
+
+/// Global allocator usando syscalls do kernel
+#[global_allocator]
+static ALLOCATOR: redpowder::mem::heap::SyscallAllocator = redpowder::mem::heap::SyscallAllocator;
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
