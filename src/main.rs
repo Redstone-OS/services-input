@@ -97,11 +97,12 @@ pub extern "C" fn _start() -> ! {
                 || mouse.y != last_mouse.y
                 || mouse.buttons != last_mouse.buttons
             {
-                // TODO: Remover log de mouse futuramente
+                /*
                 println!(
                     "(Input) Mouse: ({}, {}) buttons={}",
                     mouse.x, mouse.y, mouse.buttons
                 );
+                */
 
                 let req = InputUpdateRequest {
                     op: opcodes::INPUT_UPDATE,
@@ -125,8 +126,8 @@ pub extern "C" fn _start() -> ! {
             }
         }
 
-        // Sleep curto para não saturar a CPU nem o IPC
-        sleep(16); // ~60Hz
+        // Sleep curto para aumentar a fluidez (125Hz polling)
+        sleep(8);
     }
 }
 
