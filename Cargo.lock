@@ -4,18 +4,26 @@ version = 4
 
 [[package]]
 name = "gfx_types"
-version = "0.1.0"
+version = "0.2.0"
+dependencies = [
+ "rdsmath",
+]
 
 [[package]]
 name = "input"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
  "redpowder",
 ]
 
 [[package]]
+name = "rdsmath"
+version = "0.1.0"
+
+[[package]]
 name = "redpowder"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "gfx_types",
+ "rdsmath",
 ]

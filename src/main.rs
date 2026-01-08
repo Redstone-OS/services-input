@@ -29,11 +29,12 @@ struct InputUpdateRequest {
 pub extern "C" fn _start() -> ! {
     println!("");
     println!("==================================================");
-    println!("   RedstoneOS Input Service v1.1.0");
+    println!("   RedstoneOS Input Service v0.0.1");
     println!("==================================================");
     println!("(Input) Iniciando serviço...");
 
     // Conectar ao Compositor
+    let mut wait_count = 0u32;
     let compositor_port = loop {
         match redpowder::ipc::Port::connect("firefly.compositor") {
             Ok(p) => {
@@ -41,7 +42,11 @@ pub extern "C" fn _start() -> ! {
                 break p;
             }
             Err(_) => {
-                println!("(Input) Aguardando Compositor...");
+                // Imprimir apenas a cada 10 tentativas para reduzir contenção no serial
+                if wait_count % 10 == 0 {
+                    println!("(Input) Aguardando Compositor...");
+                }
+                wait_count += 1;
                 sleep(100);
             }
         }

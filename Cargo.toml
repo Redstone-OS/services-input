@@ -1,6 +1,6 @@
 [package]
 name = "input"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
 [[bin]]
@@ -8,7 +8,7 @@ name = "input"
 path = "src/main.rs"
 
 [dependencies]
-redpowder = { path = "../../redpowder" }
+redpowder = { path = "../../sdk/redpowder" }
 
 [profile.release]
 panic = "abort"
